@@ -14,15 +14,21 @@ public class QuestionInterpreter : MonoBehaviour
      */
 
     public TextAsset [] w1_questionnaire; // World 1
-
+    TextAsset questionnaire;
     private void LoadQuestion (int World, int Level)
     {
+        switch (World)
+        {
+            case 0: // World 1
+                questionnaire = w1_questionnaire [Level];
+                break;
+        }
 
+        InterpetQuestion (questionnaire);
     }
 
-    private void InterpetQuestion (TextAsset [] Questionnaire)
+    private void InterpetQuestion (TextAsset Questionnaire)
     {
 
     }
-
 }
