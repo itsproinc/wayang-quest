@@ -6,6 +6,16 @@ TagManager:
   tags:
   - ChoiceText
   - QuestionText
+  - TimerText
+  - MoveCounterText
+  - PlayerHP
+  - EnemyHP
+  - DialogueText
+  - DialogueName
+  - Loading
+  - LoadingCanvas
+  - World
+  - LevelList
   layers:
   - Default
   - TransparentFX

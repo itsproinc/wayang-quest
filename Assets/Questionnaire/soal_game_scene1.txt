@@ -8,5 +8,5 @@ Kitab hukum atau perundang-undangan Majapahit disebut?|Piagam bendasari|Piagam t
 Kitab Sutasoma dikarang oleh seorang pujangga Kerajaan Majapahit yang bernama|Mpu Tantular|Mpu Prapanca|Mpu sindok|Mpu Sedah|0;
 Kapan kerajaan Majapahit berdiri?|1309|1389|1293|1364|2;
 Kapan Gajah Mada diangkat menjadi patih|1312-1321|1321-1324|1318-1321|1319-1321|3;
-Majapahit di sebut juga sebagai|Kesatuan kesatu|kesatuan kedua|kesatuan ketiga|kesatuan keempat|1;
-Siapakah yang disebut Rajasanegara di kerajaan Majapahit|Hayam Wuruk|Tribhuana|Gajah mada|Patih|3
+Majapahit di sebut juga sebagai|Kesatuan kesatu|Kesatuan kedua|Kesatuan ketiga|Kesatuan keempat|1;
+Siapakah yang disebut Rajasanegara di kerajaan Majapahit|Hayam Wuruk|Tribhuana|Gajah mada|Patih|1
