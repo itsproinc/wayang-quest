@@ -1,125 +1,91 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 using System.Linq;
+using UnityEngine.UI;
+using System.Text.RegularExpressions;
 
 public class BattleManager : MonoBehaviour
 {
-    TextInterpreter questionInterpreter;
-    public float targetHP;
-    public float enemyHealth;
-    public float enemyHealthLoss;
-    public float playerHealth;
-    public float playerHealthLoss;
-    public Transform playerHPBar;
-    public Transform enemyHPBar;
-    float maxEnemyHP = 3f;
-    float maxPlayerHP = 3f;
-    public AudioSource sfx;
-    public AudioClip punch;
-    public AudioClip slashPrajurit;
+    public TextAsset questionnaireTest;
+    public AnimationClip loadTimeReference;
+    protected internal static TextAsset currentQuestionnaire;
+
+    private void OnEnable()
+    {
+        if (currentQuestionnaire == null)
+            currentQuestionnaire = questionnaireTest;
+
+        choicesButton.AddRange(GameObject.FindGameObjectsWithTag("Choices").OrderBy(cB => cB.name));
+        questionText = GameObject.FindGameObjectWithTag("QuestionText").GetComponent<Text>();
+    }
+
     private void Start()
     {
-        questionInterpreter = GetComponent<TextInterpreter>();
-
-        playerHPBar = GameObject.FindGameObjectWithTag("PlayerHP").GetComponent<Transform>();
-        enemyHPBar = GameObject.FindGameObjectWithTag("EnemyHP").GetComponent<Transform>();
-        sfx = GameObject.FindGameObjectWithTag("SFX").GetComponent<AudioSource>();
-
-        ResetHP();
+        StartCoroutine(WaitAndLoadCutscene());
     }
 
-    protected internal void ResetHP()
+    private IEnumerator WaitAndLoadCutscene()
     {
-        playerHealth = 1;
-        enemyHealth = 1;
-        enemyHealthLoss = 0;
+        yield return new WaitForSeconds(loadTimeReference.length);
+        LoadBattle();
     }
 
-    protected internal void Battle(int side)
+    List<string> questionDataList = new List<string>();
+    private void LoadBattle()
     {
-        switch (side)
+        questionDataList = currentQuestionnaire.text.Split(new char[] { ';' }, StringSplitOptions.None).ToList();
+        ShowQuestion();
+    }
+
+    Text questionText;
+    int answerIndex;
+    public List<GameObject> choicesButton = new List<GameObject>();
+    public List<string> currentData = new List<string>();
+    char[] alphabet = new char[] { 'A', 'B', 'C', 'D' };
+    private void ShowQuestion()
+    {
+        int randomDataIndex = UnityEngine.Random.Range(0, questionDataList.Count);
+
+        string rawCurrentData = questionDataList[randomDataIndex];
+        rawCurrentData = Regex.Replace(rawCurrentData, @"\t|\n|\r", "");
+        currentData = rawCurrentData.Split(new char[] { '|' }, StringSplitOptions.None).ToList();
+        questionText.text = currentData[0];
+        currentData.RemoveAt(0);
+
+        answerIndex = int.Parse(currentData[currentData.Count - 1]);
+        currentData.RemoveAt(currentData.Count - 1);
+
+        List<string> choiceReference = new List<string>(currentData);
+        int i = 0;
+        foreach (GameObject choiceButton in choicesButton)
         {
-            case 0: // Deduct player
-                updatePlayerHP = true;
-                playerHealthLoss++;
-                sfx.PlayOneShot(slashPrajurit);
-                break;
+            Button cButon = choiceButton.GetComponent<Button>();
+            cButon.onClick.RemoveAllListeners();
+            int randomChoiceIndex = UnityEngine.Random.Range(0, currentData.Count);
 
-            case 1: // Deduct enemy
-                updateEnemyHP = true;
-                enemyHealthLoss++;
-                sfx.PlayOneShot(punch);
-                break;
+            Text choiceText = choiceButton.transform.GetChild(0).GetComponent<Text>();
+            choiceText.text = alphabet[i++] + ". " + currentData[randomChoiceIndex];
+
+            int realIndex = choiceReference.IndexOf(currentData[randomChoiceIndex]);
+            cButon.onClick.AddListener(() => ChooseChoice(realIndex));
+
+            currentData.RemoveAt(randomChoiceIndex);
         }
-
-        // Detect if player health is 0
-        if (playerHealth <= 0)
-            GameOver();
-
-        // Detect if enemy health is 0
-        if (enemyHealth <= 0)
-            Win();
     }
 
-    bool updateEnemyHP;
-    bool updatePlayerHP;
+    public void ChooseChoice(int index)
+    {
+        if (index == answerIndex)
+            Debug.Log("Answer correct");
+        else
+            Debug.Log("Answer wrong!");
+    }
+
     private void Update()
     {
-        if (updateEnemyHP)
-        {
-            float divider = 1f / maxEnemyHP;
-            targetHP = 1f - (enemyHealthLoss * divider);
-            if (enemyHealth > targetHP)
-            {
-                enemyHealth -= Time.deltaTime;
-                enemyHPBar.localScale = new Vector3(enemyHealth, enemyHPBar.localScale.y, enemyHPBar.localScale.z);
-            }
-            else
-            {
-                updateEnemyHP = false;
-            }
-        }
-        else
-        {
-            if (enemyHealth < 0)
-            {
-                enemyHealth = 0;
-                enemyHPBar.localScale = new Vector3(enemyHealth, enemyHPBar.localScale.y, enemyHPBar.localScale.z);
-            }
-        }
-
-        if (updatePlayerHP)
-        {
-            float divider = 1f / maxPlayerHP;
-            targetHP = 1f - (playerHealthLoss * divider);
-            if (playerHealth > targetHP)
-            {
-                playerHealth -= Time.deltaTime;
-                playerHPBar.localScale = new Vector3(playerHealth, playerHPBar.localScale.y, playerHPBar.localScale.z);
-            }
-            else
-            {
-                updatePlayerHP = false;
-            }
-        }
-        else
-        {
-            if (playerHealth < 0)
-            {
-                playerHealth = 0;
-                playerHPBar.localScale = new Vector3(playerHealth, enemyHPBar.localScale.y, enemyHPBar.localScale.z);
-            }
-        }
-    }
-
-    protected internal void GameOver()
-    {
-        Debug.Log("GameOver");
-    }
-
-    protected internal void Win()
-    {
-
+        // Healthbar animation
+         
     }
 }

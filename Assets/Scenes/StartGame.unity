@@ -285,7 +285,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 1
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -5863,7 +5863,7 @@ GameObject:
   - component: {fileID: 1629437271}
   - component: {fileID: 1629437275}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: StartGame Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

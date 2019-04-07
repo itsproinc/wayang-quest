@@ -11,7 +11,7 @@ public class WorldMapManager : MonoBehaviour
     LoadingManager loadingManager;
     public GameObject[] world;
     public GameObject[] levelList;
-    public static int currentWorld = 0;
+    protected internal static int currentWorld = 0;
 
     private void Reset()
     {

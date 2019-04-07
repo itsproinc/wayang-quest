@@ -18,7 +18,7 @@ public class TextManager : MonoBehaviour
         {
             case 0:
                 Cutscene.currentCutscene = w1_cutscene[level];
-                TextInterpreter.questionnaire = w1_questionnaire[level];
+                BattleManager.currentQuestionnaire = w1_questionnaire[level];
                 break;
         }
     }

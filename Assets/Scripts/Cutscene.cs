@@ -9,7 +9,7 @@ public class Cutscene : MonoBehaviour
 {
     // Cutscene world 1
     public TextAsset cutsceneTest;
-    public static TextAsset currentCutscene;
+    protected internal static TextAsset currentCutscene;
 
     public static int[] cutSceneData;
     Text dialogueName;
@@ -55,9 +55,7 @@ public class Cutscene : MonoBehaviour
     private IEnumerator ShowCutscene(int DialogueIndex)
     {
         if (currentDialogue >= dialogueList.Length)
-        {
             SceneManager.LoadScene(3);
-        }
         else
         {
             dialogueData = dialogueList[DialogueIndex].Split(new char[] { '|' }, StringSplitOptions.None);

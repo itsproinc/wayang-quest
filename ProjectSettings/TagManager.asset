@@ -4,7 +4,6 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - ChoiceText
   - QuestionText
   - TimerText
   - MoveCounterText
@@ -16,6 +15,7 @@ TagManager:
   - LoadingCanvas
   - World
   - LevelList
+  - Choices
   layers:
   - Default
   - TransparentFX
