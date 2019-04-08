@@ -19,6 +19,7 @@ public class BattleManager : MonoBehaviour
 
         choicesButton.AddRange(GameObject.FindGameObjectsWithTag("Choices").OrderBy(cB => cB.name));
         questionText = GameObject.FindGameObjectWithTag("QuestionText").GetComponent<Text>();
+        playerHPBar = GameObject.FindGameObjectWithTag("PlayerHP").GetComponent<Transform>();
     }
 
     private void Start()
@@ -83,9 +84,16 @@ public class BattleManager : MonoBehaviour
             Debug.Log("Answer wrong!");
     }
 
+    // HPBar
+    public int playerHealth;
+    Transform playerHPBar;
+
+    // Timer
     private void Update()
     {
         // Healthbar animation
-         
+
+        // Timer
+
     }
 }
