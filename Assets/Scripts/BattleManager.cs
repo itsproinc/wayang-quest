@@ -18,6 +18,7 @@ public class BattleManager : MonoBehaviour
             currentQuestionnaire = questionnaireTest;
 
         choicesButton.AddRange(GameObject.FindGameObjectsWithTag("Choices").OrderBy(cB => cB.name));
+        timerText = GameObject.FindGameObjectWithTag("TimerText").GetComponent<Text>();
         questionText = GameObject.FindGameObjectWithTag("QuestionText").GetComponent<Text>();
         playerHPBar = GameObject.FindGameObjectWithTag("PlayerHP").GetComponent<Transform>();
     }
@@ -47,6 +48,7 @@ public class BattleManager : MonoBehaviour
     char[] alphabet = new char[] { 'A', 'B', 'C', 'D' };
     private void ShowQuestion()
     {
+        currentTurn = (currentTurn == 0) ? 1 : 0;
         int randomDataIndex = UnityEngine.Random.Range(0, questionDataList.Count);
 
         string rawCurrentData = questionDataList[randomDataIndex];
@@ -74,12 +76,16 @@ public class BattleManager : MonoBehaviour
 
             currentData.RemoveAt(randomChoiceIndex);
         }
+
+        StopAllCoroutines();
+        timerText.text = (curTimer = maxTimer).ToString();
+        StartCoroutine(timer());
     }
 
     public void ChooseChoice(int index)
     {
         if (index == answerIndex)
-            Debug.Log("Answer correct");
+            ShowQuestion();
         else
             Debug.Log("Answer wrong!");
     }
@@ -87,13 +93,42 @@ public class BattleManager : MonoBehaviour
     // HPBar
     public int playerHealth;
     Transform playerHPBar;
-
+    int maxTimer = 20;
+    int curTimer;
+    Text timerText;
+    bool hpBarAnimation;
     // Timer
     private void Update()
     {
         // Healthbar animation
+        if (hpBarAnimation)
+        {
 
-        // Timer
+        }
+    }
+
+    IEnumerator timer()
+    {
+        yield return new WaitForSeconds(1);
+        timerText.text = (--curTimer).ToString();
+        if (curTimer > 0)
+            StartCoroutine(timer());
+        else
+        {
+            foreach (GameObject choiceButton in choicesButton)
+            {
+                Text choiceText = choiceButton.transform.GetChild(0).GetComponent<Text>();
+                choiceText.text = "";
+                questionText.text = "";
+            }
+
+            DoDamage(currentTurn);
+        }
+    }
+
+    int currentTurn = 1; // 0 - Player, 1 - Enemy
+    public void DoDamage(int turn)
+    {
 
     }
 }
