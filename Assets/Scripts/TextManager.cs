@@ -6,7 +6,7 @@ using System;
 public class TextManager : MonoBehaviour
 {
     public TextAsset[] w1_cutscene;
-    public TextAsset[] w1_questionnaire;
+    public TextAsset[] w1_word;
 
     public void LoadLevel(string RawLevelData)
     {
@@ -18,7 +18,7 @@ public class TextManager : MonoBehaviour
         {
             case 0:
                 Cutscene.currentCutscene = w1_cutscene[level];
-                BattleManager.currentQuestionnaire = w1_questionnaire[level];
+                BattleManager.currentWord = w1_word[level];
                 break;
         }
     }

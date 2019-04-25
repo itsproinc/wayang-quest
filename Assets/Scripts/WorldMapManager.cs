@@ -32,7 +32,7 @@ public class WorldMapManager : MonoBehaviour
         switch (currentWorld)
         {
             case 0:
-                levelAmount = textManager.w1_questionnaire.Length;
+                levelAmount = textManager.w1_word.Length;
                 break;
         }
 

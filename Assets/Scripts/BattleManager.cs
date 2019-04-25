@@ -8,19 +8,20 @@ using System.Text.RegularExpressions;
 
 public class BattleManager : MonoBehaviour
 {
-    public TextAsset questionnaireTest;
+    public TextAsset wordTest;
     public AnimationClip loadTimeReference;
-    protected internal static TextAsset currentQuestionnaire;
+    protected internal static TextAsset currentWord;
 
     private void OnEnable()
     {
-        if (currentQuestionnaire == null)
-            currentQuestionnaire = questionnaireTest;
+        if (currentWord == null)
+            currentWord = wordTest;
 
-        choicesButton.AddRange(GameObject.FindGameObjectsWithTag("Choices").OrderBy(cB => cB.name));
         timerText = GameObject.FindGameObjectWithTag("TimerText").GetComponent<Text>();
-        questionText = GameObject.FindGameObjectWithTag("QuestionText").GetComponent<Text>();
+        wordText = GameObject.FindGameObjectWithTag("QuestionText").GetComponent<Text>();
         playerHPBar = GameObject.FindGameObjectWithTag("PlayerHP").GetComponent<Transform>();
+        enemyHPBar = GameObject.FindGameObjectWithTag("EnemyHP").GetComponent<Transform>();
+        moveCounterText = GameObject.FindGameObjectWithTag("MoveCounterText").GetComponent<Text>();
     }
 
     private void Start()
@@ -34,48 +35,35 @@ public class BattleManager : MonoBehaviour
         LoadBattle();
     }
 
-    List<string> questionDataList = new List<string>();
+    public List<string> wordDataList = new List<string>();
     private void LoadBattle()
     {
-        questionDataList = currentQuestionnaire.text.Split(new char[] { ';' }, StringSplitOptions.None).ToList();
+        wordDataList = currentWord.text.Split(new char[] { ';' }, StringSplitOptions.None).ToList();
+        CalculateDamage();
         ShowQuestion();
     }
 
-    Text questionText;
+    Text wordText;
     int answerIndex;
-    public List<GameObject> choicesButton = new List<GameObject>();
-    public List<string> currentData = new List<string>();
+    List<string> currentData = new List<string>();
     char[] alphabet = new char[] { 'A', 'B', 'C', 'D' };
+    Text moveCounterText;
     private void ShowQuestion()
     {
-        currentTurn = (currentTurn == 0) ? 1 : 0;
-        int randomDataIndex = UnityEngine.Random.Range(0, questionDataList.Count);
+        int randomDataIndex = UnityEngine.Random.Range(0, wordDataList.Count);
+        string rawCurrentData = wordDataList[randomDataIndex];
+        wordDataList.Remove(rawCurrentData);
+        moveCounterText.text = "Move left: " + wordDataList.Count;
 
-        string rawCurrentData = questionDataList[randomDataIndex];
         rawCurrentData = Regex.Replace(rawCurrentData, @"\t|\n|\r", "");
         currentData = rawCurrentData.Split(new char[] { '|' }, StringSplitOptions.None).ToList();
-        questionText.text = currentData[0];
+        wordText.text = currentData[0];
         currentData.RemoveAt(0);
 
         answerIndex = int.Parse(currentData[currentData.Count - 1]);
         currentData.RemoveAt(currentData.Count - 1);
 
-        List<string> choiceReference = new List<string>(currentData);
-        int i = 0;
-        foreach (GameObject choiceButton in choicesButton)
-        {
-            Button cButon = choiceButton.GetComponent<Button>();
-            cButon.onClick.RemoveAllListeners();
-            int randomChoiceIndex = UnityEngine.Random.Range(0, currentData.Count);
 
-            Text choiceText = choiceButton.transform.GetChild(0).GetComponent<Text>();
-            choiceText.text = alphabet[i++] + ". " + currentData[randomChoiceIndex];
-
-            int realIndex = choiceReference.IndexOf(currentData[randomChoiceIndex]);
-            cButon.onClick.AddListener(() => ChooseChoice(realIndex));
-
-            currentData.RemoveAt(randomChoiceIndex);
-        }
 
         StopAllCoroutines();
         timerText.text = (curTimer = maxTimer).ToString();
@@ -84,26 +72,77 @@ public class BattleManager : MonoBehaviour
 
     public void ChooseChoice(int index)
     {
-        if (index == answerIndex)
-            ShowQuestion();
-        else
-            Debug.Log("Answer wrong!");
+        if (!hpBarAnimation)
+        {
+            if (index == answerIndex)
+            {
+                Debug.Log("Correct");
+                if (currentTurn == 0)
+                    DoDamage();
+                else
+                {
+                    currentTurn = (currentTurn == 0) ? 1 : 0;
+                    ShowQuestion();
+                }
+            }
+            else
+            {
+                Debug.Log("Wrong");
+                if (currentTurn == 0)
+                {
+                    currentTurn = (currentTurn == 0) ? 1 : 0;
+                    ShowQuestion();
+                }
+                else
+                    DoDamage();
+            }
+        }
     }
 
     // HPBar
-    public int playerHealth;
     Transform playerHPBar;
+    Transform enemyHPBar;
     int maxTimer = 20;
     int curTimer;
     Text timerText;
     bool hpBarAnimation;
+    float targetHP;
     // Timer
     private void Update()
     {
         // Healthbar animation
         if (hpBarAnimation)
         {
-
+            if (currentTurn == 0)
+            {
+                if (currentEnemyHP > targetHP)
+                {
+                    float enemyHP = currentEnemyHP -= Time.deltaTime;
+                    enemyHPBar.localScale = new Vector3(enemyHP, enemyHPBar.localScale.y, enemyHPBar.localScale.z);
+                    currentEnemyHP = enemyHP;
+                }
+                else
+                {
+                    hpBarAnimation = false;
+                    currentTurn = (currentTurn == 0) ? 1 : 0;
+                    ShowQuestion();
+                }
+            }
+            else
+            {
+                if (currentPlayerHP > targetHP)
+                {
+                    float playerHP = currentPlayerHP -= Time.deltaTime;
+                    playerHPBar.localScale = new Vector3(playerHP, enemyHPBar.localScale.y, enemyHPBar.localScale.z);
+                    currentPlayerHP = playerHP;
+                }
+                else
+                {
+                    hpBarAnimation = false;
+                    currentTurn = (currentTurn == 0) ? 1 : 0;
+                    ShowQuestion();
+                }
+            }
         }
     }
 
@@ -114,21 +153,33 @@ public class BattleManager : MonoBehaviour
         if (curTimer > 0)
             StartCoroutine(timer());
         else
-        {
-            foreach (GameObject choiceButton in choicesButton)
-            {
-                Text choiceText = choiceButton.transform.GetChild(0).GetComponent<Text>();
-                choiceText.text = "";
-                questionText.text = "";
-            }
-
-            DoDamage(currentTurn);
-        }
+            DoDamage();
     }
 
-    int currentTurn = 1; // 0 - Player, 1 - Enemy
-    public void DoDamage(int turn)
+    public int currentTurn = 0; // 0 - Player, 1 - Enemy    
+    float currentPlayerHP;
+    public float currentEnemyHP;
+    public void DoDamage()
     {
+        hpBarAnimation = true;
+        if (currentTurn == 0) // Deduct enemy HP (player attack)
+            targetHP = currentEnemyHP - realPlayerDamage;
+        else
+            targetHP = currentPlayerHP - realEnemyDamage;
+    }
 
+    int playerMaxHP = 3;
+    float playerDamage = 1;
+    public float realPlayerDamage;
+    int enemyMaxHP = 3;
+    float enemyDamage = 1;
+    float realEnemyDamage;
+    private void CalculateDamage()
+    {
+        currentPlayerHP = 1;
+        currentEnemyHP = 1;
+
+        realPlayerDamage = playerDamage / enemyMaxHP;
+        realEnemyDamage = enemyDamage / playerMaxHP;
     }
 }
