@@ -1,0 +1,12 @@
+1.Dimanakah letak kerajaan majapahit?|Jawa Timur|Jawa Barat|Jawa Tengah|Sumatra|0;
+2.Pada masa pemerintah siapakah kerajaan majapahit mencapai puncak kejayaan?|Gajahmada|Ken Arok|Hayam Wuruk|Raden Wijaya|2;
+3.Siapa raja pertama di kerjaan majapahit?|Kubilai Khan|Raden Wijaya|Jayanegara|Tribhuwana Wijayatunggadewi|1;
+4.Apa agama yang dianut oleh kerjaan Majapahit|Islam|Kristen|Hindu|Siwa-Budha|2;
+5.Apa bentuk pemerintahan di kerajaan Majapahit|Republik|Monarki|Tidak ada yang benar|Otokrasi|1;
+6.Di ambil dari kata apakah Majapahit|dari Buah Maja yang memiliki rasa yang Pahit|Dari sebuah Nama Hutan di Jawa Timur|Dari bahasa Sansekerta|Dari Pararaton|0;
+7.kitab hukum atau perundang-undangan Majapahit disebut?|Piagam bendasari|Piagam trowulan|sang ama wabhumi|Kutaramanawa|3;
+8.Kitab Sutasoma dikarang oleh seorang pujangga Kerajaan Majapahit yang bernama|Mpu Tantular|Mpu Prapanca|Mpu sindok|Mpu Sedah|0;
+9.Kapan kerajaan Majapahit berdiri?|1309|1389|1293|1364|2;
+10.Kapan Gajah Mada diangkat menjadi patih|1312-1321|1321-1324|1318-1321|1319-1321|3;
+11.Majapahit di sebut juga sebagai|Kesatuan kesatu|kesatuan kedua|kesatuan ketiga|kesatuan keempat|1;
+12.Siapakah yang disebut Rajasanegara di kerajaan Majapahit|Hayam Wuruk|Tribhuana|Gajah mada|Patih|3;

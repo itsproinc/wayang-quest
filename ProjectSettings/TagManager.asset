@@ -4,17 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
+  - WordTiles
+  - LetterTiles
   - TimerText
-  - MoveCounterText
   - PlayerHP
   - EnemyHP
-  - DialogueText
-  - DialogueName
-  - Loading
-  - LoadingCanvas
-  - World
-  - LevelList
-  - Choices
+  - MoveCounterText
   layers:
   - Default
   - TransparentFX

@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 using System.Linq;
 using UnityEngine.UI;
 using System.Text.RegularExpressions;
+using System;
 
 public class BattleManager : MonoBehaviour
 {
@@ -18,10 +18,12 @@ public class BattleManager : MonoBehaviour
             currentWord = wordTest;
 
         timerText = GameObject.FindGameObjectWithTag("TimerText").GetComponent<Text>();
-        wordText = GameObject.FindGameObjectWithTag("QuestionText").GetComponent<Text>();
         playerHPBar = GameObject.FindGameObjectWithTag("PlayerHP").GetComponent<Transform>();
         enemyHPBar = GameObject.FindGameObjectWithTag("EnemyHP").GetComponent<Transform>();
         moveCounterText = GameObject.FindGameObjectWithTag("MoveCounterText").GetComponent<Text>();
+
+        wordTilesPool = GameObject.FindGameObjectWithTag("WordTiles").GetComponent<Transform>();
+        letterTilesPool = GameObject.FindGameObjectWithTag("LetterTiles").GetComponent<Transform>();
     }
 
     private void Start()
@@ -40,30 +42,82 @@ public class BattleManager : MonoBehaviour
     {
         wordDataList = currentWord.text.Split(new char[] { ';' }, StringSplitOptions.None).ToList();
         CalculateDamage();
-        ShowQuestion();
+        ShowWord();
     }
 
-    Text wordText;
-    int answerIndex;
-    List<string> currentData = new List<string>();
-    char[] alphabet = new char[] { 'A', 'B', 'C', 'D' };
-    Text moveCounterText;
-    private void ShowQuestion()
-    {
-        int randomDataIndex = UnityEngine.Random.Range(0, wordDataList.Count);
-        string rawCurrentData = wordDataList[randomDataIndex];
-        wordDataList.Remove(rawCurrentData);
-        moveCounterText.text = "Move left: " + wordDataList.Count;
+    public Transform letterPanel;
+    Transform wordTilesPool;
+    Transform letterTilesPool;
 
+    public List<string> currentData = new List<string>();
+    public string rawCurrentData;
+    Text moveCounterText;
+
+    string current_index;
+    string current_word;
+    string current_letters;
+    string current_hint;
+    public List<string> current_anagram = new List<string>();
+
+    List<Transform> wordTiles = new List<Transform>();
+    List<Transform> rawletterTiles = new List<Transform>();
+    List<Transform> letterTiles = new List<Transform>();
+    private void ShowWord()
+    {
+        // Get random words then iterate it's data
+        int randomDataIndex = UnityEngine.Random.Range(0, wordDataList.Count);
+        rawCurrentData = wordDataList[randomDataIndex];
+        moveCounterText.text = "Move left: " + wordDataList.Count;
         rawCurrentData = Regex.Replace(rawCurrentData, @"\t|\n|\r", "");
         currentData = rawCurrentData.Split(new char[] { '|' }, StringSplitOptions.None).ToList();
-        wordText.text = currentData[0];
+
+        // Place each iterated data into variable
+        current_index = currentData[0];
+        current_word = currentData[1];
+        current_letters = currentData[2];
+        current_hint = currentData[3];
+        current_anagram = currentData[4].Split(new char[] { ',' }, StringSplitOptions.None).ToList();
+
+        // End of iteration
+        wordDataList.Remove(rawCurrentData);
         currentData.RemoveAt(0);
 
-        answerIndex = int.Parse(currentData[currentData.Count - 1]);
-        currentData.RemoveAt(currentData.Count - 1);
+        // Show word tiles
+        foreach (char characters in current_word)
+        {
+            // Instantiate tiles
+            Transform currentWordTile = Instantiate(letterPanel).GetComponent<Transform>();
+            currentWordTile.SetParent(wordTilesPool);
+            currentWordTile.localScale = new Vector3(1, 1, 1);
 
+            wordTiles.Add(currentWordTile);
+        }
 
+        // Get all letters
+        List<char> letters = new List<char>();
+        foreach (char characters in current_letters)
+        {
+            letters.Add(characters);
+        }
+
+        // Show letter tiles
+        int index = letters.Count;
+        for (int i = 0; i < index; i++)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, letters.Count);
+
+            // Instantiate tiles
+            Transform currentLetterTile = Instantiate(letterPanel).GetComponent<Transform>();
+            currentLetterTile.SetParent(letterTilesPool);
+            currentLetterTile.localScale = new Vector3(1, 1, 1);
+
+            // Text
+            Text currentLetterText = currentLetterTile.GetChild(0).GetComponent<Text>();
+            currentLetterText.text = letters[randomIndex].ToString();
+
+            rawletterTiles.Add(currentLetterTile);
+            letters.RemoveAt(randomIndex);
+        }
 
         StopAllCoroutines();
         timerText.text = (curTimer = maxTimer).ToString();
@@ -74,28 +128,28 @@ public class BattleManager : MonoBehaviour
     {
         if (!hpBarAnimation)
         {
-            if (index == answerIndex)
-            {
-                Debug.Log("Correct");
-                if (currentTurn == 0)
-                    DoDamage();
-                else
-                {
-                    currentTurn = (currentTurn == 0) ? 1 : 0;
-                    ShowQuestion();
-                }
-            }
-            else
-            {
-                Debug.Log("Wrong");
-                if (currentTurn == 0)
-                {
-                    currentTurn = (currentTurn == 0) ? 1 : 0;
-                    ShowQuestion();
-                }
-                else
-                    DoDamage();
-            }
+            // if (index == answerIndex)
+            // {
+            //     Debug.Log("Correct");
+            //     if (currentTurn == 0)
+            //         DoDamage();
+            //     else
+            //     {
+            //         currentTurn = (currentTurn == 0) ? 1 : 0;
+            //         ShowWord();
+            //     }
+            // }
+            // else
+            // {
+            //     Debug.Log("Wrong");
+            //     if (currentTurn == 0)
+            //     {
+            //         currentTurn = (currentTurn == 0) ? 1 : 0;
+            //         ShowWord();
+            //     }
+            //     else
+            //         DoDamage();
+            // }
         }
     }
 
@@ -118,14 +172,14 @@ public class BattleManager : MonoBehaviour
                 if (currentEnemyHP > targetHP)
                 {
                     float enemyHP = currentEnemyHP -= Time.deltaTime;
-                    enemyHPBar.localScale = new Vector3(enemyHP, enemyHPBar.localScale.y, enemyHPBar.localScale.z);
+                    enemyHPBar.localScale = new Vector3(enemyHPBar.localScale.x, enemyHP, enemyHPBar.localScale.z);
                     currentEnemyHP = enemyHP;
                 }
                 else
                 {
                     hpBarAnimation = false;
                     currentTurn = (currentTurn == 0) ? 1 : 0;
-                    ShowQuestion();
+                    ShowWord();
                 }
             }
             else
@@ -133,14 +187,14 @@ public class BattleManager : MonoBehaviour
                 if (currentPlayerHP > targetHP)
                 {
                     float playerHP = currentPlayerHP -= Time.deltaTime;
-                    playerHPBar.localScale = new Vector3(playerHP, enemyHPBar.localScale.y, enemyHPBar.localScale.z);
+                    playerHPBar.localScale = new Vector3(enemyHPBar.localScale.x, playerHP, enemyHPBar.localScale.z);
                     currentPlayerHP = playerHP;
                 }
                 else
                 {
                     hpBarAnimation = false;
                     currentTurn = (currentTurn == 0) ? 1 : 0;
-                    ShowQuestion();
+                    ShowWord();
                 }
             }
         }
