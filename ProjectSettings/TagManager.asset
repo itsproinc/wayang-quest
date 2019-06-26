@@ -10,6 +10,10 @@ TagManager:
   - PlayerHP
   - EnemyHP
   - MoveCounterText
+  - Loading
+  - LoadingCanvas
+  - PartofSpeechText
+  - HintText
   layers:
   - Default
   - TransparentFX

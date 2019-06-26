@@ -3,7 +3,17 @@ guid: 3d9db6caa97b9c448b41b704e7d7b511
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - wordTest: {fileID: 4900000, guid: c0234730cc06c1848bbc15df5bd6bb9b, type: 3}
+  - loadTimeReference: {fileID: 7400000, guid: 183a47244bffb4e49b059641b5907c16, type: 2}
+  - letterButton: {fileID: 2401937111162165007, guid: f2fcbc14fb423a2489386b95a0c8d215,
+      type: 3}
+  - letterPressed: {fileID: 8300000, guid: f9a24b44194dc894b80c421883b83d3c, type: 3}
+  - wrongWord: {fileID: 8300000, guid: 77eeb236a41a8774e96e968ac5dfa382, type: 3}
+  - correctWord: {fileID: 8300000, guid: 7df455e708bfa2240a0072a6cd63e9e0, type: 3}
+  - shake: {fileID: 7400000, guid: 1d38a587b3fffea4b8e99ad6a48acbc7, type: 2}
+  - shuffle: {fileID: 7400000, guid: 91087713b138db74998c06c45733c3f8, type: 2}
+  - cadet: {fileID: 2727750939972959613, guid: fffd3ca7a69c01144b50eecdb7ae2d7a, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
