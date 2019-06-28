@@ -14,6 +14,10 @@ TagManager:
   - LoadingCanvas
   - PartofSpeechText
   - HintText
+  - LevelList
+  - World
+  - MainCharacter
+  - LevelInfo
   layers:
   - Default
   - TransparentFX

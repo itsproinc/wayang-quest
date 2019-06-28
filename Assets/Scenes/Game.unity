@@ -958,6 +958,7 @@ MonoBehaviour:
   currentTurn: 0
   currentEnemyHP: 0
   realPlayerDamage: 0
+  itsssssplayerhp: 0
 --- !u!114 &430075041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1371,7 +1372,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 529557622}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 744.5, y: 52.9, z: -9720}
+  m_LocalPosition: {x: 389, y: 48, z: -9720}
   m_LocalScale: {x: 91.445755, y: 87.0912, z: 272.15997}
   m_Children: []
   m_Father: {fileID: 430075045}
@@ -2423,7 +2424,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 766379487}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -731.4, y: 76, z: -9719.999}
+  m_LocalPosition: {x: -307, y: 86, z: -9719.999}
   m_LocalScale: {x: 37.324802, y: 31.104002, z: 77.76}
   m_Children: []
   m_Father: {fileID: 430075045}
