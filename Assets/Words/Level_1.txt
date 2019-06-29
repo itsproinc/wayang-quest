@@ -1,30 +1,30 @@
-﻿1001|noun:CARD, one of a set of small pieces of stiff paper marked in various ways and used for playing games or for telling fortunes|CARD|^
-1002|noun:LAST, a person's dying act, the final thing a person can do|LAST|noun:ALTS, angular distance above the horizon (especially of a celestial object)/noun:SALT, the taste experience when common salt is taken into the mouth/noun:LATS, the basic unit of money in Latvia/noun:SLAT, a thin strip (wood or metal)^
-1003|noun:ONCE, one time only|ONCE|noun:CONE, any cone-shaped artifact^
-1004|noun:LIAR, a person who has lied or who lies repeatedly|LIAR|noun:ARIL, fleshy and usually brightly colored cover of some seeds that develops from the ovule stalk and partially or entirely envelops the seed/noun:LAIR, the habitation of wild animals/noun:LARI, the basic unit of money in Georgia/noun:LIRA, the basic unit of money in Turkey/noun:RAIL, short for railway/noun:RIAL, the basic unit of money in Iran^
-1005|noun:TALK, an exchange of ideas via conversation|TALK|^
-1006|noun:BLUE, the sky as viewed during daylight|BLUE|noun:LUBE, a substance capable of reducing friction by making surfaces smooth or slippery^
-1007|noun:SUCK, the act of sucking|SUCK|noun:CUSK, elongate freshwater cod of northern Europe and Asia and North America having barbels around its mouth^
-1008|noun:WORD, a unit of language that native speakers can identify|WORD|^
-1009|noun:GAME, an amusement or pastime|GAME|noun:MAGE, a magician or learned person/noun:MEGA, very large^
-1010|noun:TUBE, an electric railway operating below the surface of the ground (usually in a city)|TUBE|noun:BUTE, another term for phenylbutazone^
-1011|noun:CASE, a comprehensive term for any proceeding in a court of law whereby an individual seeks a legal remedy|CASE|noun:ACES, a serve that the receiver is unable to reach^
-1012|noun:LATE, of the immediate past or just previous to the present time|LATE|noun:TAEL, a unit of weight used in east Asia approximately equal to 1.3 ounces/noun:TALE, a trivial lie/noun:TEAL, any of various small short-necked dabbling river ducks of Europe and America^
-1013|noun:SEAL, any of numerous marine mammals that come on shore to breed; chiefly of cold regions|SEAL|noun:LASE, to emit laser light/noun:ALES, an alcoholic drink that is similar to beerme on shore to breed; chiefly of cold regions/noun:LEAS, a unit of length of thread or yarn/noun:SALE, a particular instance of selling^
-1014|noun:MADE, produced by a manufacturing process|MADE|noun:DAME, a woman of refinement/noun:MEAD, made of fermented honey and water^
-1015|noun:HOME, housing that someone is living in|HOME|^
-1016|noun:CAST, a violent throw|CAST|noun:ACTS, a New Testament book describing the development of the early church from Christ's Ascension to Paul's sojourn at Rome/noun:CATS,  a method of examining body organs by scanning them with X rays and using a computer to construct a series of cross-sectional scans along a single axis/noun:SCAT, singing jazz; the singer substitutes nonsense syllables for the words of the song and tries to sound like a musical instrument^
-1017|noun:ABLE, (usually followed by to') having the necessary means or skill or know-how or authority to do something|ABLE|noun:BALE, a large bundle bound for storage or transport/noun:BLAE, of bluish-black or grey-blue^
-1018|noun:AGED, people who are old collectively|AGED|noun:EGAD, expressing surprise, anger, or affirmation/noun:GAED, Gaed is a Scottish word that is defined as to go^
-1019|noun:ARID, lacking sufficient water or rainfall|ARID|noun:RAID, an attempt by speculators to defraud investors^
-1020|noun:BACK, a support that you can lean against while sitting|BACK|^
-1021|noun:BARE, make public|BARE|noun:BEAR, massive plantigrade carnivorous or omnivorous mammals with long shaggy coats and strong claws/noun:BRAE, a slope or hillside^
-1022|noun:BEST, the supreme effort one can make|BEST|noun:BETS, the act of gambling^
-1023|noun:BOLD, a typeface with thick heavy lines|BOLD|^
-1024|noun:BONY, having bones especially many or prominent bones|BONY|^
-1025|noun:BUSY, keep busy with|BUSY|noun:BUYS, an advantageous purchase^
-1026|noun:CALM, steadiness of mind under stress|CALM|noun:CLAM, burrowing marine mollusk living on sand or mud; the shell closes with viselike firmness^
-1027|noun:COLD, the absence of heat|COLD|noun:CLOD, a compact mass^
-1028|noun:COOK, someone who cooks food|COOK|^
-1029|noun:CUTE, obviously contrived to charm|CUTE|^
-1030|noun:DEAD, people who are no longer living|DEAD|
+﻿1|noun:CARD, one of a set of small pieces of stiff paper marked in various ways and used for playing games or for telling fortunes|CARD|^
+2|noun:LAST, a person's dying act, the final thing a person can do|LAST|noun:ALTS, angular distance above the horizon (especially of a celestial object)/noun:SALT, the taste experience when common salt is taken into the mouth/noun:LATS, the basic unit of money in Latvia/noun:SLAT, a thin strip (wood or metal)^
+3|noun:ONCE, one time only|ONCE|noun:CONE, any cone-shaped artifact^
+4|noun:LIAR, a person who has lied or who lies repeatedly|LIAR|noun:ARIL, fleshy and usually brightly colored cover of some seeds that develops from the ovule stalk and partially or entirely envelops the seed/noun:LAIR, the habitation of wild animals/noun:LARI, the basic unit of money in Georgia/noun:LIRA, the basic unit of money in Turkey/noun:RAIL, short for railway/noun:RIAL, the basic unit of money in Iran^
+5|noun:TALK, an exchange of ideas via conversation|TALK|^
+6|noun:BLUE, the sky as viewed during daylight|BLUE|noun:LUBE, a substance capable of reducing friction by making surfaces smooth or slippery^
+7|noun:SUCK, the act of sucking|SUCK|noun:CUSK, elongate freshwater cod of northern Europe and Asia and North America having barbels around its mouth^
+8|noun:WORD, a unit of language that native speakers can identify|WORD|^
+9|noun:GAME, an amusement or pastime|GAME|noun:MAGE, a magician or learned person/noun:MEGA, very large^
+10|noun:TUBE, an electric railway operating below the surface of the ground (usually in a city)|TUBE|noun:BUTE, another term for phenylbutazone^
+11|noun:CASE, a comprehensive term for any proceeding in a court of law whereby an individual seeks a legal remedy|CASE|noun:ACES, a serve that the receiver is unable to reach^
+12|noun:LATE, of the immediate past or just previous to the present time|LATE|noun:TAEL, a unit of weight used in east Asia approximately equal to 1.3 ounces/noun:TALE, a trivial lie/noun:TEAL, any of various small short-necked dabbling river ducks of Europe and America^
+13|noun:SEAL, any of numerous marine mammals that come on shore to breed; chiefly of cold regions|SEAL|noun:LASE, to emit laser light/noun:ALES, an alcoholic drink that is similar to beerme on shore to breed; chiefly of cold regions/noun:LEAS, a unit of length of thread or yarn/noun:SALE, a particular instance of selling^
+14|noun:MADE, produced by a manufacturing process|MADE|noun:DAME, a woman of refinement/noun:MEAD, made of fermented honey and water^
+15|noun:HOME, housing that someone is living in|HOME|^
+16|noun:CAST, a violent throw|CAST|noun:ACTS, a New Testament book describing the development of the early church from Christ's Ascension to Paul's sojourn at Rome/noun:CATS,  a method of examining body organs by scanning them with X rays and using a computer to construct a series of cross-sectional scans along a single axis/noun:SCAT, singing jazz; the singer substitutes nonsense syllables for the words of the song and tries to sound like a musical instrument^
+17|noun:ABLE, (usually followed by to') having the necessary means or skill or know-how or authority to do something|ABLE|noun:BALE, a large bundle bound for storage or transport/noun:BLAE, of bluish-black or grey-blue^
+18|noun:AGED, people who are old collectively|AGED|noun:EGAD, expressing surprise, anger, or affirmation/noun:GAED, Gaed is a Scottish word that is defined as to go^
+19|noun:ARID, acking sufficient water or rainfall|ARID|noun:RAID, an attempt by speculators to defraud investors^
+20|noun:BACK, a support that you can lean against while sitting|BACK|^
+21|noun:BARE, make public|BARE|noun:BEAR, massive plantigrade carnivorous or omnivorous mammals with long shaggy coats and strong claws/noun:BRAE, a slope or hillside^
+22|noun:BEST, the supreme effort one can make|BEST|noun:BETS, the act of gambling^
+23|noun:BOLD, a typeface with thick heavy lines|BOLD|^
+24|noun:BONY, having bones especially many or prominent bones|BONY|^
+25|noun:BUSY, keep busy with|BUSY|noun:BUYS, an advantageous purchase^
+26|noun:CALM, steadiness of mind under stress|CALM|noun:CLAM, burrowing marine mollusk living on sand or mud; the shell closes with viselike firmness^
+27|noun:COLD, the absence of heat|COLD|noun:CLOD, a compact mass^
+28|noun:COOK, someone who cooks food|COOK|^
+29|noun:CUTE, obviously contrived to charm|CUTE|^
+30|noun:DEAD, people who are no longer living|DEAD|

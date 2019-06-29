@@ -7,10 +7,11 @@ using System.IO;
 
 public class WorldMapManager : MonoBehaviour
 {
-  public TextAsset WordBank1_1;
+  public TextAsset WordBank1;
+  public TextAsset WordBank2;
+  public TextAsset WordBank3;
 
-  public List<TextAsset> level1WordBank = new List<TextAsset>();
-  public List<List<TextAsset>> wordBank = new List<List<TextAsset>>();
+  public List<TextAsset> wordBank = new List<TextAsset>();
 
   LoadingManager loadingManager;
   protected internal static int currentWorld = 0;
@@ -22,8 +23,9 @@ public class WorldMapManager : MonoBehaviour
 
   private void Start()
   {
-    level1WordBank.Add(WordBank1_1);
-    wordBank.Add(level1WordBank);
+    wordBank.Add(WordBank1);
+    wordBank.Add(WordBank2);
+    wordBank.Add(WordBank3);
 
     loadingManager = GameObject.FindGameObjectWithTag("Loading").GetComponent<LoadingManager>();
 
@@ -74,6 +76,11 @@ public class WorldMapManager : MonoBehaviour
       {
         levelUI[i].GetChild(1 + j).GetChild(0).gameObject.SetActive(true);
       }
+
+      if (!currentLevelData.unlock)
+      {
+        levelUI[i].GetChild(4).gameObject.SetActive(true);
+      }
     }
 
     for (int i = 0; i < levelUI.Count; i++)
@@ -93,7 +100,7 @@ public class WorldMapManager : MonoBehaviour
     string fileLink = Application.persistentDataPath + "/Save/World" + World + "/Level" + Level + ".json";
     if (!File.Exists(fileLink))
     {
-      SaveData(World, Level);
+      NewData(World, Level);
       return null;
     }
     else
@@ -104,7 +111,7 @@ public class WorldMapManager : MonoBehaviour
   }
 
   LevelData recentlySavedData;
-  private void SaveData(int World, int Level)
+  private void NewData(int World, int Level)
   {
     string fileLink = Application.persistentDataPath + "/Save/World" + World + "/Level" + Level + ".json";
     // Check folder
@@ -119,7 +126,12 @@ public class WorldMapManager : MonoBehaviour
     levelDataClass.currentWorld = currentWorld + 1;
     levelDataClass.currentLevel = Level + 1;
     levelDataClass.star = 0;
-    levelDataClass.timeTaken = 0;
+    levelDataClass.minuteTaken = "00";
+    levelDataClass.secondTaken = "00";
+    if (Level == 0)
+      levelDataClass.unlock = true;
+    else
+      levelDataClass.unlock = false;
 
     StreamWriter sw = File.CreateText(fileLink);
     sw.Close();
@@ -130,30 +142,103 @@ public class WorldMapManager : MonoBehaviour
     recentlySavedData = levelDataClass;
   }
 
+  protected internal static void SaveData(int World, int Level, int star, String minuteTaken, String secondTaken)
+  {
+    int curWorld = World - 1;
+    int curLevel = Level - 1;
+
+    string fileLink = Application.persistentDataPath + "/Save/World" + curWorld + "/Level" + curLevel + ".json";
+    File.Delete(fileLink);
+    // Check folder
+    if (!Directory.Exists(Application.persistentDataPath + "/Save"))
+      Directory.CreateDirectory(Application.persistentDataPath + "/Save");
+
+    if (!Directory.Exists(Application.persistentDataPath + "/Save/World" + curWorld))
+      Directory.CreateDirectory(Application.persistentDataPath + "/Save/World" + curWorld);
+
+    // Create file
+    LevelData levelDataClass = new LevelData();
+    levelDataClass.currentWorld = curWorld + 1;
+    levelDataClass.currentLevel = curLevel + 1;
+    levelDataClass.star = star;
+    levelDataClass.minuteTaken = minuteTaken;
+    levelDataClass.secondTaken = secondTaken;
+    levelDataClass.unlock = true;
+
+    StreamWriter sw = File.CreateText(fileLink);
+    sw.Close();
+
+    string json = JsonUtility.ToJson(levelDataClass, true);
+    File.WriteAllText(fileLink, json);
+
+    int NextLevel = curLevel + 1;
+    UnlockNextLevel(curWorld, NextLevel);
+  }
+
+  static void UnlockNextLevel(int World, int Level)
+  {
+    string fileLink = Application.persistentDataPath + "/Save/World" + World + "/Level" + Level + ".json";
+    File.Delete(fileLink);
+
+    // Check folder
+    if (!Directory.Exists(Application.persistentDataPath + "/Save"))
+      Directory.CreateDirectory(Application.persistentDataPath + "/Save");
+
+    if (!Directory.Exists(Application.persistentDataPath + "/Save/World" + World))
+      Directory.CreateDirectory(Application.persistentDataPath + "/Save/World" + World);
+
+    // Create file
+    LevelData levelDataClass = new LevelData();
+    levelDataClass.currentWorld = currentWorld + 1;
+    levelDataClass.currentLevel = Level + 1;
+    levelDataClass.star = 0;
+    levelDataClass.minuteTaken = "00";
+    levelDataClass.secondTaken = "00";
+    levelDataClass.unlock = true;
+
+    StreamWriter sw = File.CreateText(fileLink);
+    sw.Close();
+
+    string json = JsonUtility.ToJson(levelDataClass, true);
+    File.WriteAllText(fileLink, json);
+  }
+
   public GameObject levelInfoUI;
   private void OpenLevelInfo(LevelData levelInfo)
   {
-    levelInfoUI.SetActive(true);
-
-    // Level text
-    levelInfoUI.transform.GetChild(1).GetComponent<Text>().text = "Level " + levelInfo.currentWorld + "-" + levelInfo.currentLevel;
-
-    // Star
-    for (int i = 0; i < levelInfo.star; i++)
+    if (levelInfo.unlock)
     {
-      levelInfoUI.transform.GetChild(2 + i).gameObject.SetActive(true);
+      // Reset
+      for (int i = 0; i < 3; i++)
+      {
+        levelInfoUI.transform.GetChild(2 + i).GetChild(0).gameObject.SetActive(false);
+      }
+      levelInfoUI.transform.GetChild(5).GetComponent<Text>().text = "00:00";
+
+
+      levelInfoUI.SetActive(true);
+
+      // Level text
+      levelInfoUI.transform.GetChild(1).GetComponent<Text>().text = "Level " + levelInfo.currentWorld + "-" + levelInfo.currentLevel;
+
+      // Star
+      for (int i = 0; i < levelInfo.star; i++)
+      {
+        levelInfoUI.transform.GetChild(2 + i).GetChild(0).gameObject.SetActive(true);
+      }
+
+      // Timer
+      levelInfoUI.transform.GetChild(5).GetComponent<Text>().text = levelInfo.minuteTaken + ":" + levelInfo.secondTaken;
+
+      BattleManager.currentWord = wordBank[levelInfo.currentLevel - 1];
+      BattleManager.currentWorld = levelInfo.currentWorld;
+      BattleManager.currentLevel = levelInfo.currentLevel;
+
+      // Button
+      Button button = levelInfoUI.transform.GetChild(6).GetComponent<Button>();
+      button.onClick.AddListener(() => loadingManager.LoadTransition(0));
+      button.onClick.AddListener(() => loadingManager.NextScene("Game"));
     }
-
-    // Timer
-    int timeTaken = levelInfo.timeTaken;
-    levelInfoUI.transform.GetChild(5).GetComponent<Text>().text = timeTaken.ToString("N2");
-
-    BattleManager.currentWord = wordBank[levelInfo.currentWorld - 1][levelInfo.currentLevel - 1];
-
-    // Button
-    Button button = levelInfoUI.transform.GetChild(6).GetComponent<Button>();
-    button.onClick.AddListener(() => loadingManager.LoadTransition(0));
-    button.onClick.AddListener(() => loadingManager.NextScene("Game"));
   }
 
   public void CloseLevelInfo()
@@ -167,6 +252,8 @@ public class WorldMapManager : MonoBehaviour
     public int currentWorld;
     public int currentLevel;
     public int star;
-    public int timeTaken;
+    public string secondTaken;
+    public string minuteTaken;
+    public bool unlock;
   }
 }

@@ -5,13 +5,18 @@ using System.Linq;
 using UnityEngine.UI;
 using System.Text.RegularExpressions;
 using System;
+using UnityEngine.SceneManagement;
 
 public class BattleManager : MonoBehaviour
 {
   public TextAsset wordTest;
   public AnimationClip loadTimeReference;
   protected internal static TextAsset currentWord;
-  int turnLeft = 10;
+  public int turnLeft = 10;
+  protected internal static int currentWorld = 1;
+  protected internal static int currentLevel = 1;
+
+  LoadingManager loadingManager;
 
   private void OnEnable()
   {
@@ -33,12 +38,14 @@ public class BattleManager : MonoBehaviour
     wordTilesPool_Animator = wordTilesPool.GetComponent<Animator>();
     letterTilesPool_Animator = letterTilesPool.GetComponent<Animator>();
 
-    letterAudio = GetComponent<AudioSource>();
+    gameAudio = GetComponent<AudioSource>();
   }
 
   private void Start()
   {
-    CalculateDamage();
+    loadingManager = GameObject.FindGameObjectWithTag("Loading").GetComponent<LoadingManager>();
+
+    CalculateHealth();
     StartCoroutine(WaitAndLoadCutscene());
   }
 
@@ -95,8 +102,25 @@ public class BattleManager : MonoBehaviour
   List<Transform> letterTiles = new List<Transform>();
 
   Text currentLetterText;
+
+  public Transform playerHalo;
+  public Transform enemyHalo;
   private void ShowWord()
   {
+    turnLeft--;
+
+    // Halo
+    if (currentTurn == 0)
+    {
+      playerHalo.gameObject.SetActive(true);
+      enemyHalo.gameObject.SetActive(false);
+    }
+    else
+    {
+      playerHalo.gameObject.SetActive(false);
+      enemyHalo.gameObject.SetActive(true);
+    }
+
     // Remove tiles
     if (wordTiles.Count > 0)
     {
@@ -117,7 +141,6 @@ public class BattleManager : MonoBehaviour
     int randomDataIndex = UnityEngine.Random.Range(0, wordDataList.Count);
 
     rawCurrentData = wordDataList[randomDataIndex];
-    Debug.Log(turnLeft);
     moveCounterText.text = "Move left: " + turnLeft;
     rawCurrentData = Regex.Replace(rawCurrentData, @"\t|\n|\r", String.Empty);
     currentData = rawCurrentData.Split(new char[] { '|' }, StringSplitOptions.None).ToList();
@@ -141,14 +164,14 @@ public class BattleManager : MonoBehaviour
     lettersInput = new String[current_wordSize];
     lettersInputTiles = new Button[current_wordSize];
 
+    anagram_word.Clear();
+    anagram_partOfSpeech.Clear();
+    anagram_definition.Clear();
+    usedAnagram.Clear();
     // Find and store anagram
     if (currentData[3] != "")
     {
       String[] rawAnagram = currentData[3].Split(new char[] { '/' }, StringSplitOptions.None);
-
-      anagram_word.Clear();
-      anagram_partOfSpeech.Clear();
-      anagram_definition.Clear();
 
       foreach (String anagram in rawAnagram)
       {
@@ -404,12 +427,12 @@ public class BattleManager : MonoBehaviour
   {
     if (!disablePress)
     {
-      letterAudio.PlayOneShot(letterPressed);
+      gameAudio.PlayOneShot(letterPressed);
 
       if (lettersInputTiles[index] != null)
       {
         // Show hidden letter tile
-        lettersInputTiles[index].GetComponent<Image>().color = new Color32(255, 255, 255, 100);
+        lettersInputTiles[index].GetComponent<Image>().color = new Color32(255, 255, 255, 255);
         lettersInputTiles[index].interactable = true;
 
         // Text (letter tile)
@@ -430,19 +453,22 @@ public class BattleManager : MonoBehaviour
   }
 
   public AudioClip letterPressed;
-  AudioSource letterAudio;
+  AudioSource gameAudio;
   public String currentPressedWord;
 
   public AudioClip wrongWord;
   public AudioClip correctWord;
+  public AudioClip anagramWord;
 
   public AnimationClip shake;
   public bool disablePress;
+  public List<String> usedAnagram = new List<string>();
+  bool isAnagram;
   public void LetterPress(Button letterButton)
   {
     if (!disablePress)
     {
-      letterAudio.PlayOneShot(letterPressed);
+      gameAudio.PlayOneShot(letterPressed);
 
       // Hide
       letterButton.GetComponent<Image>().color = Color.clear;
@@ -476,27 +502,110 @@ public class BattleManager : MonoBehaviour
         // Check correct word
         if (currentPressedWord.Equals(current_word))
         {
-          letterAudio.PlayOneShot(correctWord);
-
+          gameAudio.PlayOneShot(correctWord);
+          if (currentTurn == 0)
+          {
+            DoDamage(1);
+          }
+          else
+          {
+            DoDamage(0);
+          }
         }
         else
         {
           // Check anagram
-          letterAudio.PlayOneShot(wrongWord);
-          wordTilesPool_Animator.SetBool("reset", false);
-          wordTilesPool_Animator.SetBool("wrong", true);
-
-          for (int i = 0; i < wordTiles.Count; i++)
+          if (anagram_word.Count > 0)
           {
-            // Show hidden letter tile
-            wordTiles[i].GetComponent<Image>().color = new Color32(255, 0, 0, 100);
-          }
+            if (anagram_word.Contains(currentPressedWord))
+            {
+              if (!usedAnagram.Contains(currentPressedWord))
+              {
+                // Accepted anagram (no duplicate)
+                gameAudio.PlayOneShot(anagramWord);
+                disablePress = true;
+                usedAnagram.Add(currentPressedWord);
 
-          disablePress = true;
-          StartCoroutine(ResetWordTiles(shake.length));
+                for (int j = 0; j < wordTiles.Count; j++)
+                {
+                  // Color yellow tiles
+                  wordTiles[j].GetComponent<Image>().color = new Color32(255, 255, 0, 255);
+                }
+
+                noAnimationReset = true;
+                StartCoroutine(ResetWordTiles(0.5f));
+                if (currentTurn == 0)
+                {
+                  isAnagram = true;
+                  DoDamage(0.3f);
+                }
+              }
+              else
+              {
+                for (int j = 0; j < wordTiles.Count; j++)
+                {
+                  // Color blue tiles
+                  wordTiles[j].GetComponent<Image>().color = new Color32(255, 0, 255, 255);
+                }
+                WrongWord();
+              }
+            }
+            else
+            {
+              for (int k = 0; k < wordTiles.Count; k++)
+              {
+                // Color red tiles
+                wordTiles[k].GetComponent<Image>().color = new Color32(255, 0, 0, 255);
+              }
+              WrongWord();
+              if (currentTurn == 1)
+              {
+                DoDamage(1);
+              }
+              else
+              {
+                StartCoroutine(WrongReset());
+              }
+            }
+          }
+          else
+          {
+            for (int i = 0; i < wordTiles.Count; i++)
+            {
+              // Color red tiles
+              wordTiles[i].GetComponent<Image>().color = new Color32(255, 0, 0, 255);
+            }
+
+            WrongWord();
+            if (currentTurn == 1)
+            {
+              DoDamage(1);
+            }
+            else
+            {
+
+              StartCoroutine(WrongReset());
+            }
+          }
         }
       }
     }
+  }
+
+  IEnumerator WrongReset()
+  {
+    yield return new WaitForSeconds(shake.length);
+    DoDamage(0);
+  }
+
+  void WrongWord()
+  {
+    gameAudio.PlayOneShot(wrongWord);
+    wordTilesPool_Animator.SetBool("reset", false);
+    wordTilesPool_Animator.SetBool("wrong", true);
+
+    disablePress = true;
+    StartCoroutine(ResetWordTiles(shake.length));
   }
 
   public void RemoveWordTiles()
@@ -507,17 +616,22 @@ public class BattleManager : MonoBehaviour
     }
   }
 
+  bool noAnimationReset;
   IEnumerator ResetWordTiles(float delay)
   {
     yield return new WaitForSeconds(delay);
-    wordTilesPool_Animator.SetBool("wrong", false);
-    wordTilesPool_Animator.SetBool("reset", true);
+    if (!noAnimationReset)
+    {
+      wordTilesPool_Animator.SetBool("reset", true);
+      wordTilesPool_Animator.SetBool("wrong", false);
+    }
+    noAnimationReset = false;
 
     // Reset color
     for (int i = 0; i < wordTiles.Count; i++)
     {
       // Show hidden letter tile
-      wordTiles[i].GetComponent<Image>().color = new Color32(255, 255, 255, 100);
+      wordTiles[i].GetComponent<Image>().color = new Color32(255, 255, 255, 255);
     }
 
     // Reset tiles
@@ -526,7 +640,7 @@ public class BattleManager : MonoBehaviour
       if (lettersInputTiles[i] != null)
       {
         // Show hidden letter tile
-        lettersInputTiles[i].GetComponent<Image>().color = new Color32(255, 255, 255, 100);
+        lettersInputTiles[i].GetComponent<Image>().color = new Color32(255, 255, 255, 255);
         lettersInputTiles[i].interactable = true;
 
         // Text (letter tile)
@@ -572,39 +686,10 @@ public class BattleManager : MonoBehaviour
     }
   }
 
-  public void ChooseChoice(int index)
-  {
-    if (!hpBarAnimation)
-    {
-      // if (index == answerIndex)
-      // {
-      //     Debug.Log("Correct");
-      //     if (currentTurn == 0)
-      //         DoDamage();
-      //     else
-      //     {
-      //         currentTurn = (currentTurn == 0) ? 1 : 0;
-      //         ShowWord();
-      //     }
-      // }
-      // else
-      // {
-      //     Debug.Log("Wrong");
-      //     if (currentTurn == 0)
-      //     {
-      //         currentTurn = (currentTurn == 0) ? 1 : 0;
-      //         ShowWord();
-      //     }
-      //     else
-      //         DoDamage();
-      // }
-    }
-  }
-
   // HPBar
   Transform playerHPBar;
   Transform enemyHPBar;
-  int maxTimer = 10;
+  int maxTimer = 20;
   int curTimer;
   Text timerText;
   bool hpBarAnimation;
@@ -626,8 +711,12 @@ public class BattleManager : MonoBehaviour
         else
         {
           hpBarAnimation = false;
-          currentTurn = (currentTurn == 0) ? 1 : 0;
-          ShowWord();
+          if (!isAnagram)
+          {
+            currentTurn = (currentTurn == 0) ? 1 : 0;
+            ShowWord();
+          }
+          isAnagram = false;
         }
       }
       else
@@ -648,24 +737,48 @@ public class BattleManager : MonoBehaviour
     }
     else
     {
-      playerHPText = Mathf.RoundToInt(currentPlayerHP * (float)playerMaxHP);
-      playerHPBar.parent.GetComponentInChildren<Text>().text = playerHPText.ToString();
-      enemyHPText = Mathf.RoundToInt(currentEnemyHP * (float)enemyMaxHP);
-      enemyHPBar.parent.GetComponentInChildren<Text>().text = enemyHPText.ToString();
+      playerHPText = currentPlayerHP * playerMaxHP;
+      playerHPBar.parent.GetComponentInChildren<Text>().text = playerHPText.ToString("N2");
+      enemyHPText = currentEnemyHP * enemyMaxHP;
+      enemyHPBar.parent.GetComponentInChildren<Text>().text = enemyHPText.ToString("N2");
+
+      if (turnLeft < 0 || currentPlayerHP <= 0 || currentEnemyHP <= 0)
+      {
+        StopAllCoroutines();
+
+        timerText.text = "0";
+        moveCounterText.text = "Move Left: 0";
+
+        // Lose
+        if (currentTurn < 0 || currentPlayerHP <= 0)
+          winLose = false;
+
+        // Win
+        if (currentEnemyHP <= 0)
+          winLose = true;
+
+        GameOver();
+      }
     }
   }
 
   public int currentTurn = 0; // 0 - Player, 1 - Enemy    
   float currentPlayerHP;
   public float currentEnemyHP;
-  public void DoDamage()
+  public void DoDamage(float modifier)
   {
-    turnLeft--;
+    realPlayerDamage = (playerDamage * modifier) / enemyMaxHP;
+    realEnemyDamage = (enemyDamage * modifier) / playerMaxHP;
+
     hpBarAnimation = true;
     if (currentTurn == 0) // Deduct enemy HP (player attack)
+    {
       targetHP = currentEnemyHP - realPlayerDamage;
+    }
     else
+    {
       targetHP = currentPlayerHP - realEnemyDamage;
+    }
   }
 
   int playerMaxHP = 3;
@@ -675,33 +788,136 @@ public class BattleManager : MonoBehaviour
   float enemyDamage = 1;
   float realEnemyDamage;
 
-  int playerHPText;
-  int enemyHPText;
-  private void CalculateDamage()
+  float playerHPText;
+  float enemyHPText;
+  private void CalculateHealth()
   {
     currentPlayerHP = 1;
     currentEnemyHP = 1;
 
-    realPlayerDamage = playerDamage / enemyMaxHP;
-    realEnemyDamage = enemyDamage / playerMaxHP;
-
-    playerHPText = Mathf.RoundToInt(currentPlayerHP * (float)playerMaxHP);
-    playerHPBar.parent.GetComponentInChildren<Text>().text = playerHPText.ToString();
-    enemyHPText = Mathf.RoundToInt(currentEnemyHP * (float)enemyMaxHP);
-    enemyHPBar.parent.GetComponentInChildren<Text>().text = enemyHPText.ToString();
+    playerHPText = currentPlayerHP * playerMaxHP;
+    playerHPBar.parent.GetComponentInChildren<Text>().text = playerHPText.ToString("N2");
+    enemyHPText = currentEnemyHP * enemyMaxHP;
+    enemyHPBar.parent.GetComponentInChildren<Text>().text = enemyHPText.ToString("N2");
   }
 
+  public Transform levelUI;
+  bool winLose;
+
+  public AudioClip oneStar;
+  public AudioClip twoStar;
+  public AudioClip threeStar;
+
+  public AudioClip winSFX;
+  public AudioClip loseSFX;
+
+  public AudioSource bgSoundSource;
+  bool loseOnce;
+  public int star = 1;
+
+  void GameOver()
+  {
+    if (!loseOnce)
+    {
+      loseOnce = true;
+      levelUI.gameObject.SetActive(true);
+      bgSoundSource.Stop();
+
+      Text winLoseText = levelUI.GetChild(2).GetComponent<Text>();
+      if (!winLose)
+      {
+        winLoseText.text = "LOSE";
+        gameAudio.PlayOneShot(loseSFX);
+
+      }
+      else
+      {
+        winLoseText.text = "WIN";
+        gameAudio.PlayOneShot(winSFX);
+      }
+
+      Text timer = levelUI.GetChild(6).GetComponent<Text>();
+      String minuteTimer = (totalTimer / 60).ToString();
+      String secondTimer = (totalTimer % 60).ToString();
+
+      // Calculate star   
+      if ((currentPlayerHP * playerMaxHP) >= (playerMaxHP / 2))
+      {
+        star++;
+      }
+
+      if ((currentPlayerHP * playerMaxHP) == playerMaxHP)
+      {
+        star++;
+      }
+
+      if (winLose)
+      {
+        if (currentStar < star)
+        {
+          InvokeRepeating("StarResult", 1.5f, 1f);
+        }
+      }
+
+      if (minuteTimer.Length == 1)
+      {
+        minuteTimer = "0" + minuteTimer;
+      }
+
+      if (secondTimer.Length == 1)
+      {
+        secondTimer = "0" + secondTimer;
+      }
+
+      timer.text = minuteTimer + ":" + secondTimer;
+
+      // Save
+      WorldMapManager.SaveData(currentWorld, currentLevel, star, minuteTimer, secondTimer);
+    }
+  }
+
+  int currentStar;
+  void StarResult()
+  {
+    currentStar++;
+
+    levelUI.GetChild(2 + currentStar).GetChild(0).gameObject.SetActive(true);
+    if (currentStar == 1)
+      gameAudio.PlayOneShot(oneStar);
+    else if (currentStar == 2)
+      gameAudio.PlayOneShot(twoStar);
+    else if (currentStar == 3)
+      gameAudio.PlayOneShot(threeStar);
+
+    if (currentStar >= star)
+      CancelInvoke("StarResult");
+  }
+
+  public void Replay()
+  {
+    loadingManager.LoadTransition(0);
+    loadingManager.NextScene(SceneManager.GetActiveScene().name);
+  }
+
+  public void QuitToMenu()
+  {
+    loadingManager.LoadTransition(0);
+    loadingManager.NextScene("WorldMap");
+  }
+
+  int totalTimer;
   IEnumerator timer()
   {
     yield return new WaitForSeconds(1);
     timerText.text = (--curTimer).ToString();
+    totalTimer++;
     if (curTimer > 0)
       StartCoroutine(timer());
     else
     {
       if (currentTurn != 0)
       {
-        DoDamage();
+        DoDamage(1);
       }
       else
       {
