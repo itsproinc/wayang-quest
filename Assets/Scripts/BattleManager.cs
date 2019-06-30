@@ -15,7 +15,9 @@ public class BattleManager : MonoBehaviour
   public int turnLeft = 10;
   protected internal static int currentWorld = 1;
   protected internal static int currentLevel = 1;
+  protected internal static int prevStar = 0;
 
+  Animator battleCanvas;
   LoadingManager loadingManager;
 
   private void OnEnable()
@@ -43,6 +45,11 @@ public class BattleManager : MonoBehaviour
 
   private void Start()
   {
+    maxTimer *= currentLevel;
+    if (maxTimer > 100)
+      maxTimer = 100;
+
+    battleCanvas = GetComponent<Animator>();
     loadingManager = GameObject.FindGameObjectWithTag("Loading").GetComponent<LoadingManager>();
 
     CalculateHealth();
@@ -212,6 +219,7 @@ public class BattleManager : MonoBehaviour
     StartCoroutine(timer());
 
     LetterPlacementCheck();
+    anagramModifier = 0;
   }
 
   public String shuffledLetter;
@@ -454,6 +462,7 @@ public class BattleManager : MonoBehaviour
 
   public AudioClip letterPressed;
   AudioSource gameAudio;
+  public AudioSource tickingAudio;
   public String currentPressedWord;
 
   public AudioClip wrongWord;
@@ -464,6 +473,7 @@ public class BattleManager : MonoBehaviour
   public bool disablePress;
   public List<String> usedAnagram = new List<string>();
   bool isAnagram;
+  public int anagramModifier;
   public void LetterPress(Button letterButton)
   {
     if (!disablePress)
@@ -502,6 +512,7 @@ public class BattleManager : MonoBehaviour
         // Check correct word
         if (currentPressedWord.Equals(current_word))
         {
+          tickingAudio.Stop();
           gameAudio.PlayOneShot(correctWord);
           if (currentTurn == 0)
           {
@@ -509,6 +520,7 @@ public class BattleManager : MonoBehaviour
           }
           else
           {
+            battleCanvas.SetTrigger("Shield");
             DoDamage(0);
           }
         }
@@ -536,8 +548,14 @@ public class BattleManager : MonoBehaviour
                 StartCoroutine(ResetWordTiles(0.5f));
                 if (currentTurn == 0)
                 {
+                  battleCanvas.SetTrigger("SmallAttack");
                   isAnagram = true;
                   DoDamage(0.3f);
+                }
+                else
+                {
+                  anagramModifier++;
+                  battleCanvas.SetTrigger("UpShield");
                 }
               }
               else
@@ -548,6 +566,7 @@ public class BattleManager : MonoBehaviour
                   wordTiles[j].GetComponent<Image>().color = new Color32(255, 0, 255, 255);
                 }
                 WrongWord();
+                tickingAudio.Stop();
               }
             }
             else
@@ -558,6 +577,7 @@ public class BattleManager : MonoBehaviour
                 wordTiles[k].GetComponent<Image>().color = new Color32(255, 0, 0, 255);
               }
               WrongWord();
+              tickingAudio.Stop();
               if (currentTurn == 1)
               {
                 DoDamage(1);
@@ -757,6 +777,20 @@ public class BattleManager : MonoBehaviour
         if (currentEnemyHP <= 0)
           winLose = true;
 
+        if (currentEnemyHP < 0)
+        {
+          currentEnemyHP = 0;
+          enemyHPText = currentEnemyHP * enemyMaxHP;
+          enemyHPBar.parent.GetComponentInChildren<Text>().text = enemyHPText.ToString("N2");
+        }
+
+        if (currentPlayerHP < 0)
+        {
+          currentPlayerHP = 0;
+          playerHPText = currentPlayerHP * playerMaxHP;
+          playerHPBar.parent.GetComponentInChildren<Text>().text = playerHPText.ToString("N2");
+        }
+
         GameOver();
       }
     }
@@ -767,8 +801,24 @@ public class BattleManager : MonoBehaviour
   public float currentEnemyHP;
   public void DoDamage(float modifier)
   {
+    // Animation (normal attack)
+    if (modifier == 1)
+    {
+      if (currentTurn == 0)
+      {
+        battleCanvas.SetTrigger("BigAttack");
+      }
+    }
+
+    if (modifier > 0 && currentTurn == 1)
+    {
+      battleCanvas.SetTrigger("EnemyAttack");
+    }
+
+    float anagramDefence = playerDamage - (anagramModifier * 0.1f);
+
     realPlayerDamage = (playerDamage * modifier) / enemyMaxHP;
-    realEnemyDamage = (enemyDamage * modifier) / playerMaxHP;
+    realEnemyDamage = ((enemyDamage * modifier) / playerMaxHP) * anagramDefence;
 
     hpBarAnimation = true;
     if (currentTurn == 0) // Deduct enemy HP (player attack)
@@ -781,10 +831,10 @@ public class BattleManager : MonoBehaviour
     }
   }
 
-  int playerMaxHP = 3;
+  float playerMaxHP = 3;
   float playerDamage = 1;
   public float realPlayerDamage;
-  int enemyMaxHP = 3;
+  float enemyMaxHP = 3;
   float enemyDamage = 1;
   float realEnemyDamage;
 
@@ -792,6 +842,8 @@ public class BattleManager : MonoBehaviour
   float enemyHPText;
   private void CalculateHealth()
   {
+    enemyMaxHP += ((currentWorld * currentLevel) * 0.5f);
+
     currentPlayerHP = 1;
     currentEnemyHP = 1;
 
@@ -822,6 +874,7 @@ public class BattleManager : MonoBehaviour
       loseOnce = true;
       levelUI.gameObject.SetActive(true);
       bgSoundSource.Stop();
+      tickingAudio.Stop();
 
       Text winLoseText = levelUI.GetChild(2).GetComponent<Text>();
       if (!winLose)
@@ -872,7 +925,10 @@ public class BattleManager : MonoBehaviour
       timer.text = minuteTimer + ":" + secondTimer;
 
       // Save
-      WorldMapManager.SaveData(currentWorld, currentLevel, star, minuteTimer, secondTimer);
+      if (winLose && star > prevStar)
+      {
+        WorldMapManager.SaveData(currentWorld, currentLevel, star, minuteTimer, secondTimer);
+      }
     }
   }
 
@@ -906,11 +962,18 @@ public class BattleManager : MonoBehaviour
   }
 
   int totalTimer;
+  public AudioClip tickingSound;
+  public AudioClip timesUp;
   IEnumerator timer()
   {
     yield return new WaitForSeconds(1);
     timerText.text = (--curTimer).ToString();
     totalTimer++;
+    if (curTimer == 5)
+    {
+      tickingAudio.PlayOneShot(tickingSound);
+    }
+
     if (curTimer > 0)
       StartCoroutine(timer());
     else
@@ -921,10 +984,49 @@ public class BattleManager : MonoBehaviour
       }
       else
       {
+        gameAudio.PlayOneShot(timesUp);
         currentTurn = (currentTurn == 0) ? 1 : 0;
         turnLeft--;
         ShowWord();
       }
     }
+  }
+
+
+  public AudioClip punch;
+  public AudioClip enemyAttack;
+  public AudioClip playerShield;
+  public AudioClip playerShieldUp;
+  public void BattleSound(int audioIndex)
+  {
+    switch (audioIndex)
+    {
+      case 0: gameAudio.PlayOneShot(punch); break;
+      case 1: gameAudio.PlayOneShot(enemyAttack); break;
+      case 2: gameAudio.PlayOneShot(playerShield); break;
+      case 3: gameAudio.PlayOneShot(playerShieldUp); break;
+    }
+  }
+
+  public GameObject pauseUI;
+  public void Pause()
+  {
+    pauseUI.SetActive(true);
+    Time.timeScale = 0;
+
+    gameAudio.Pause();
+    tickingAudio.Pause();
+    bgSoundSource.Pause();
+  }
+
+  public void UnPause()
+  {
+    pauseUI.SetActive(false);
+    Time.timeScale = 1;
+
+    gameAudio.UnPause();
+    tickingAudio.UnPause();
+    bgSoundSource.UnPause();
+
   }
 }

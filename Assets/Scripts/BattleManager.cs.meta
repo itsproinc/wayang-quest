@@ -11,6 +11,7 @@ MonoImporter:
   - playerHalo: {instanceID: 0}
   - enemyHalo: {instanceID: 0}
   - letterPressed: {fileID: 8300000, guid: f9a24b44194dc894b80c421883b83d3c, type: 3}
+  - tickingAudio: {instanceID: 0}
   - wrongWord: {fileID: 8300000, guid: 77eeb236a41a8774e96e968ac5dfa382, type: 3}
   - correctWord: {fileID: 8300000, guid: 7df455e708bfa2240a0072a6cd63e9e0, type: 3}
   - anagramWord: {fileID: 8300000, guid: 63f2b740966b7f54d8ee5208a33fd664, type: 3}
@@ -22,6 +23,13 @@ MonoImporter:
   - threeStar: {fileID: 8300000, guid: 56f8bbf3c0379f1429362a2bfff8fd16, type: 3}
   - winSFX: {fileID: 8300000, guid: ee1ac720e114a47468585938588ae606, type: 3}
   - loseSFX: {fileID: 8300000, guid: ce280461d8a968046b2aff8cc89015b7, type: 3}
+  - bgSoundSource: {instanceID: 0}
+  - tickingSound: {fileID: 8300000, guid: 20350305663c0f04095e529587e71e7b, type: 3}
+  - timesUp: {fileID: 8300000, guid: 27a88b22d88a50e49b118bab4089b02b, type: 3}
+  - punch: {fileID: 8300000, guid: 6da188099426f5543ad47d96798bc009, type: 3}
+  - enemyAttack: {fileID: 8300000, guid: ff484d6f400a2cd488b4cd8067d89b0c, type: 3}
+  - playerShield: {fileID: 8300000, guid: 68d46e2e08e6268419e28bc163c3fd7b, type: 3}
+  - playerShieldUp: {fileID: 8300000, guid: e9373f94fbc026c4d91fde5d77bd4c66, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

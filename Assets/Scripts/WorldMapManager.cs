@@ -10,6 +10,8 @@ public class WorldMapManager : MonoBehaviour
   public TextAsset WordBank1;
   public TextAsset WordBank2;
   public TextAsset WordBank3;
+  public TextAsset WordBank4;
+  public TextAsset WordBank5;
 
   public List<TextAsset> wordBank = new List<TextAsset>();
 
@@ -26,6 +28,8 @@ public class WorldMapManager : MonoBehaviour
     wordBank.Add(WordBank1);
     wordBank.Add(WordBank2);
     wordBank.Add(WordBank3);
+    wordBank.Add(WordBank4);
+    wordBank.Add(WordBank5);
 
     loadingManager = GameObject.FindGameObjectWithTag("Loading").GetComponent<LoadingManager>();
 
@@ -175,8 +179,22 @@ public class WorldMapManager : MonoBehaviour
     UnlockNextLevel(curWorld, NextLevel);
   }
 
+  static LevelData currentNextData;
   static void UnlockNextLevel(int World, int Level)
   {
+    int curLevel = Level - 1;
+
+    if (curLevel != 5)
+    {
+      string nextFileLink = Application.persistentDataPath + "/Save/World" + World + "/Level" + Level + ".json";
+      Debug.Log(nextFileLink);
+      if (File.Exists(nextFileLink))
+      {
+        Debug.Log("exists");
+        currentNextData = JsonUtility.FromJson<LevelData>(File.ReadAllText(nextFileLink));
+      }
+    }
+
     string fileLink = Application.persistentDataPath + "/Save/World" + World + "/Level" + Level + ".json";
     File.Delete(fileLink);
 
@@ -189,11 +207,11 @@ public class WorldMapManager : MonoBehaviour
 
     // Create file
     LevelData levelDataClass = new LevelData();
-    levelDataClass.currentWorld = currentWorld + 1;
-    levelDataClass.currentLevel = Level + 1;
-    levelDataClass.star = 0;
-    levelDataClass.minuteTaken = "00";
-    levelDataClass.secondTaken = "00";
+    levelDataClass.currentWorld = (currentNextData == null) ? currentWorld + 1 : currentNextData.currentWorld;
+    levelDataClass.currentLevel = (currentNextData == null) ? Level + 1 : currentNextData.currentLevel;
+    levelDataClass.star = (currentNextData == null) ? 0 : currentNextData.star;
+    levelDataClass.minuteTaken = (currentNextData == null) ? "00" : currentNextData.minuteTaken;
+    levelDataClass.secondTaken = (currentNextData == null) ? "00" : currentNextData.secondTaken;
     levelDataClass.unlock = true;
 
     StreamWriter sw = File.CreateText(fileLink);
@@ -233,6 +251,7 @@ public class WorldMapManager : MonoBehaviour
       BattleManager.currentWord = wordBank[levelInfo.currentLevel - 1];
       BattleManager.currentWorld = levelInfo.currentWorld;
       BattleManager.currentLevel = levelInfo.currentLevel;
+      BattleManager.prevStar = levelInfo.star;
 
       // Button
       Button button = levelInfoUI.transform.GetChild(6).GetComponent<Button>();
@@ -244,6 +263,11 @@ public class WorldMapManager : MonoBehaviour
   public void CloseLevelInfo()
   {
     levelInfoUI.SetActive(false);
+  }
+
+  public void QuitGame()
+  {
+    Application.Quit();
   }
 
   [Serializable]
